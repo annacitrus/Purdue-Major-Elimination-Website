@@ -4,49 +4,732 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Purdue Major Explorer</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,400;0,500;0,700;1,400&family=DM+Serif+Display&display=swap" rel="stylesheet">
+  <style>
+    /* ======================== */
+    /* RESET & BASE             */
+    /* ======================== */
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: #111111;
+      color: #f0f0f0;
+      min-height: 100vh;
+    }
+
+    /* ======================== */
+    /* VIEW 1: MAIN / BROWSE    */
+    /* ======================== */
+    #main-header {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: rgba(30, 30, 30, 0.97);
+      border-bottom: 1px solid #333333;
+      backdrop-filter: blur(8px);
+    }
+
+    .header-inner {
+      max-width: 960px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 16px 24px;
+    }
+
+    .header-title {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .gold-bar-tall {
+      width: 4px;
+      height: 32px;
+      background: #CFB991;
+      border-radius: 2px;
+      flex-shrink: 0;
+    }
+
+    .gold-bar-short {
+      width: 3px;
+      height: 18px;
+      background: #CFB991;
+      border-radius: 1.5px;
+      flex-shrink: 0;
+    }
+
+    .app-title {
+      font-family: 'DM Serif Display', serif;
+      font-size: 22px;
+      color: #f0f0f0;
+      font-weight: 400;
+    }
+
+    .btn-start-quiz {
+      background: #CFB991;
+      color: #111111;
+      border: none;
+      padding: 11px 26px;
+      border-radius: 22px;
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      font-family: 'DM Sans', sans-serif;
+      transition: background 0.15s;
+      letter-spacing: 0.2px;
+    }
+
+    .btn-start-quiz:hover {
+      background: #e0cca5;
+    }
+
+    .main-content {
+      max-width: 960px;
+      margin: 0 auto;
+      width: 100%;
+      padding: 28px 24px 80px;
+    }
+
+    .subtitle {
+      font-size: 14px;
+      color: #888888;
+      margin-bottom: 36px;
+      line-height: 1.7;
+    }
+
+    /* College Section */
+    .college-section {
+      margin-bottom: 44px;
+    }
+
+    .college-header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 14px;
+    }
+
+    .college-label {
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 3px;
+      color: #888888;
+    }
+
+    .college-count {
+      font-size: 12px;
+      color: #555555;
+    }
+
+    /* Major Card */
+    .major-card {
+      display: flex;
+      align-items: center;
+      background: #1e1e1e;
+      border-radius: 8px;
+      padding: 0 20px;
+      height: 56px;
+      margin-bottom: 2px;
+      transition: background 0.15s;
+    }
+
+    .major-card:hover {
+      background: #252525;
+    }
+
+    .major-name {
+      font-size: 15px;
+      color: #f0f0f0;
+      font-weight: 500;
+      flex: 1;
+    }
+
+    .major-link {
+      font-size: 12px;
+      color: #a89070;
+      text-decoration: none;
+      margin-right: 20px;
+      transition: color 0.15s;
+      white-space: nowrap;
+    }
+
+    .major-link:hover {
+      color: #CFB991;
+      text-decoration: underline;
+    }
+
+    .btn-deselect {
+      background: none;
+      border: 1px solid rgba(224, 92, 92, 0.5);
+      color: #e05c5c;
+      padding: 6px 16px;
+      border-radius: 6px;
+      font-size: 12px;
+      cursor: pointer;
+      font-family: 'DM Sans', sans-serif;
+      opacity: 0.7;
+      transition: all 0.15s;
+      white-space: nowrap;
+    }
+
+    .btn-deselect:hover {
+      background: #e05c5c;
+      border-color: #e05c5c;
+      color: #ffffff;
+      opacity: 1;
+    }
+
+    /* Deselected Section */
+    .deselected-divider {
+      border: none;
+      border-top: 1px dashed #333333;
+      margin: 36px 0 24px;
+    }
+
+    .deselected-header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 14px;
+    }
+
+    .deselected-label {
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 2px;
+      color: #555555;
+    }
+
+    .deselected-count {
+      font-size: 12px;
+      color: #444444;
+    }
+
+    .deselected-card {
+      display: flex;
+      align-items: center;
+      background: #1e1e1e;
+      border-radius: 8px;
+      padding: 0 20px;
+      height: 52px;
+      margin-bottom: 2px;
+      opacity: 0.5;
+      transition: opacity 0.15s;
+    }
+
+    .deselected-card:hover {
+      opacity: 0.7;
+    }
+
+    .deselected-name {
+      font-size: 15px;
+      color: #888888;
+      flex: 1;
+      text-decoration: line-through;
+    }
+
+    .btn-reselect {
+      background: none;
+      border: 1px solid rgba(207, 185, 145, 0.5);
+      color: #CFB991;
+      padding: 6px 16px;
+      border-radius: 6px;
+      font-size: 12px;
+      cursor: pointer;
+      font-family: 'DM Sans', sans-serif;
+      opacity: 0.7;
+      transition: all 0.15s;
+      white-space: nowrap;
+    }
+
+    .btn-reselect:hover {
+      background: #CFB991;
+      border-color: #CFB991;
+      color: #111111;
+      opacity: 1;
+    }
+
+    /* ======================== */
+    /* SHARED QUIZ OVERLAY      */
+    /* ======================== */
+    .quiz-overlay {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 40px 24px;
+    }
+
+    /* ======================== */
+    /* VIEW 2: QUIZ QUESTION    */
+    /* ======================== */
+    .quiz-card {
+      background: #1e1e1e;
+      border: 1px solid #2a2a2a;
+      border-radius: 16px;
+      padding: 48px 60px;
+      width: 100%;
+      max-width: 800px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .active-count-badge {
+      border: 1px solid #CFB991;
+      border-radius: 18px;
+      padding: 8px 28px;
+      margin-bottom: 28px;
+      font-size: 14px;
+      color: #CFB991;
+      font-weight: 500;
+    }
+
+    .progress-bar-wrap {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 48px;
+    }
+
+    .progress-bar-bg {
+      flex: 1;
+      height: 4px;
+      background: #2a2a2a;
+      border-radius: 2px;
+      overflow: hidden;
+    }
+
+    .progress-bar-fill {
+      height: 100%;
+      background: #CFB991;
+      border-radius: 2px;
+      transition: width 0.35s ease;
+      width: 0%;
+    }
+
+    .progress-label {
+      font-size: 11px;
+      color: #555555;
+      white-space: nowrap;
+    }
+
+    .question-text {
+      font-family: 'DM Serif Display', serif;
+      font-size: 32px;
+      color: #f0f0f0;
+      text-align: center;
+      margin-bottom: 16px;
+      line-height: 1.35;
+      font-weight: 400;
+    }
+
+    .gold-accent-line {
+      width: 140px;
+      height: 2px;
+      background: #CFB991;
+      opacity: 0.3;
+      border-radius: 1px;
+      margin-bottom: 40px;
+    }
+
+    .answer-buttons {
+      display: flex;
+      gap: 20px;
+      width: 100%;
+      margin-bottom: 28px;
+    }
+
+    .btn-yes {
+      flex: 1;
+      height: 68px;
+      background: #CFB991;
+      color: #111111;
+      border: none;
+      border-radius: 12px;
+      font-size: 18px;
+      font-weight: 700;
+      cursor: pointer;
+      font-family: 'DM Sans', sans-serif;
+      transition: background 0.15s;
+    }
+
+    .btn-yes:hover {
+      background: #e0cca5;
+    }
+
+    .btn-no {
+      flex: 1;
+      height: 68px;
+      background: transparent;
+      color: #CFB991;
+      border: 2px solid #CFB991;
+      border-radius: 12px;
+      font-size: 18px;
+      font-weight: 700;
+      cursor: pointer;
+      font-family: 'DM Sans', sans-serif;
+      transition: background 0.15s;
+    }
+
+    .btn-no:hover {
+      background: rgba(207, 185, 145, 0.08);
+    }
+
+    .btn-exit-link {
+      background: none;
+      border: none;
+      color: #888888;
+      font-size: 14px;
+      cursor: pointer;
+      font-family: 'DM Sans', sans-serif;
+      padding: 8px 4px;
+      margin-bottom: 16px;
+      transition: color 0.15s;
+    }
+
+    .btn-exit-link:hover {
+      color: #f0f0f0;
+    }
+
+    .kbd-hints {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      opacity: 0.4;
+    }
+
+    .kbd {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 26px;
+      height: 22px;
+      border: 1px solid #555555;
+      border-radius: 4px;
+      font-size: 11px;
+      color: #555555;
+      font-family: 'DM Sans', sans-serif;
+    }
+
+    .kbd-label {
+      font-size: 11px;
+      color: #444444;
+      margin-right: 14px;
+    }
+
+    /* =============================== */
+    /* VIEW 3: ELIMINATIONS            */
+    /* =============================== */
+    .elim-card {
+      background: #1e1e1e;
+      border: 1px solid #2a2a2a;
+      border-radius: 16px;
+      padding: 48px 60px;
+      width: 100%;
+      max-width: 920px;
+      max-height: calc(100vh - 64px);
+      overflow-y: auto;
+    }
+
+    .elim-title {
+      font-family: 'DM Serif Display', serif;
+      font-size: 28px;
+      color: #CFB991;
+      text-align: center;
+      margin-bottom: 12px;
+      font-weight: 400;
+    }
+
+    .elim-context {
+      font-size: 14px;
+      color: #888888;
+      text-align: center;
+      font-style: italic;
+      margin-bottom: 10px;
+    }
+
+    .elim-count {
+      font-size: 16px;
+      color: #f0f0f0;
+      font-weight: 700;
+      text-align: center;
+      margin-bottom: 24px;
+    }
+
+    .elim-item {
+      display: flex;
+      align-items: center;
+      background: #2a2a2a;
+      border-radius: 8px;
+      padding: 0 24px;
+      height: 60px;
+      margin-bottom: 10px;
+      transition: opacity 0.3s ease;
+    }
+
+    .elim-item.removing {
+      opacity: 0.2;
+      pointer-events: none;
+    }
+
+    .elim-item-name {
+      font-size: 15px;
+      color: #f0f0f0;
+      font-weight: 500;
+      flex: 1;
+    }
+
+    .elim-item-college {
+      font-size: 12px;
+      color: #555555;
+      margin-right: 20px;
+    }
+
+    .btn-deselect-this {
+      background: none;
+      border: 1px solid #e05c5c;
+      color: #e05c5c;
+      padding: 7px 16px;
+      border-radius: 6px;
+      font-size: 12px;
+      cursor: pointer;
+      font-family: 'DM Sans', sans-serif;
+      transition: all 0.15s;
+      white-space: nowrap;
+    }
+
+    .btn-deselect-this:hover {
+      background: #e05c5c;
+      color: #ffffff;
+    }
+
+    .elim-actions {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      margin-top: 32px;
+      flex-wrap: wrap;
+    }
+
+    .btn-danger {
+      background: #e05c5c;
+      color: #ffffff;
+      border: none;
+      padding: 14px 28px;
+      border-radius: 12px;
+      font-size: 15px;
+      font-weight: 700;
+      cursor: pointer;
+      font-family: 'DM Sans', sans-serif;
+      transition: background 0.15s;
+    }
+
+    .btn-danger:hover {
+      background: #c94f4f;
+    }
+
+    .btn-keep {
+      background: #CFB991;
+      color: #111111;
+      border: none;
+      padding: 14px 28px;
+      border-radius: 12px;
+      font-size: 15px;
+      font-weight: 700;
+      cursor: pointer;
+      font-family: 'DM Sans', sans-serif;
+      transition: background 0.15s;
+    }
+
+    .btn-keep:hover {
+      background: #e0cca5;
+    }
+
+    /* ======================== */
+    /* VIEW 4: QUIZ DONE        */
+    /* ======================== */
+    #view-quiz-done {
+      background: radial-gradient(ellipse at center, rgba(207, 185, 145, 0.05) 0%, transparent 60%);
+    }
+
+    .done-overlay {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 40px 24px;
+    }
+
+    .done-content {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      gap: 16px;
+    }
+
+    .checkmark-circle {
+      margin-bottom: 8px;
+    }
+
+    .done-title {
+      font-family: 'DM Serif Display', serif;
+      font-size: 44px;
+      color: #f0f0f0;
+      font-weight: 400;
+    }
+
+    .done-underline {
+      width: 100px;
+      height: 3px;
+      background: #CFB991;
+      opacity: 0.4;
+      border-radius: 1.5px;
+      margin-top: -4px;
+    }
+
+    .done-subtitle {
+      font-size: 17px;
+      color: #888888;
+      line-height: 1.7;
+    }
+
+    .done-count-badge {
+      background: #2a2a2a;
+      border: 1px solid #333333;
+      border-radius: 20px;
+      padding: 10px 28px;
+      font-size: 15px;
+      color: #CFB991;
+      font-weight: 700;
+    }
+
+    .btn-done-cta {
+      background: #CFB991;
+      color: #111111;
+      border: none;
+      padding: 18px 52px;
+      border-radius: 32px;
+      font-size: 18px;
+      font-weight: 700;
+      cursor: pointer;
+      font-family: 'DM Sans', sans-serif;
+      transition: background 0.15s;
+      margin-top: 8px;
+    }
+
+    .btn-done-cta:hover {
+      background: #e0cca5;
+    }
+
+    .done-hint {
+      font-size: 13px;
+      color: #555555;
+    }
+  </style>
 </head>
 <body>
 
   <!-- View: Main Page -->
   <div id="view-main" style="display:block">
-    <h1>Purdue Major Explorer</h1>
-    <p>Browse all Purdue majors by college. Deselect majors you are not interested in. When ready, take the quiz to narrow your list further.</p>
-    <button id="btn-start-quiz">Start Quiz</button>
-    <div id="active-colleges-container"></div>
-    <section id="deselected-section" style="display:none">
-      <hr>
-      <h2>Deselected Majors</h2>
-      <p>These majors have been removed from your list. Click "Re-select" to add them back.</p>
-      <div id="deselected-container"></div>
-    </section>
+    <header id="main-header">
+      <div class="header-inner">
+        <div class="header-title">
+          <div class="gold-bar-tall"></div>
+          <span class="app-title">Purdue Major Explorer</span>
+        </div>
+        <button id="btn-start-quiz" class="btn-start-quiz">Start Quiz →</button>
+      </div>
+    </header>
+    <main class="main-content">
+      <p class="subtitle">Browse all active majors across Purdue's colleges. Deselect any you're not interested in, then use the quiz to narrow your list further.</p>
+      <div id="active-colleges-container"></div>
+      <section id="deselected-section" style="display:none">
+        <hr class="deselected-divider">
+        <div class="deselected-header">
+          <span class="deselected-label">DESELECTED MAJORS</span>
+          <span id="deselected-count" class="deselected-count"></span>
+        </div>
+        <div id="deselected-container"></div>
+      </section>
+    </main>
   </div>
 
   <!-- View: Quiz Question -->
   <div id="view-question" style="display:none">
-    <p id="active-count"></p>
-    <h2 id="question-text"></h2>
-    <button id="btn-answer-yes">Yes</button>
-    <button id="btn-answer-no">No</button>
-    <br><br>
-    <button id="btn-exit-quiz">Exit Quiz (return to main page)</button>
+    <div class="quiz-overlay">
+      <div class="quiz-card">
+        <div class="active-count-badge">
+          <span id="active-count"></span>
+        </div>
+        <div class="progress-bar-wrap">
+          <div class="progress-bar-bg">
+            <div id="progress-bar-fill" class="progress-bar-fill"></div>
+          </div>
+          <span id="progress-label" class="progress-label"></span>
+        </div>
+        <h2 id="question-text" class="question-text"></h2>
+        <div class="gold-accent-line"></div>
+        <div class="answer-buttons">
+          <button id="btn-answer-yes" class="btn-yes">Yes</button>
+          <button id="btn-answer-no" class="btn-no">No</button>
+        </div>
+        <button id="btn-exit-quiz" class="btn-exit-link">← Exit Quiz</button>
+        <div class="kbd-hints">
+          <span class="kbd">Y</span><span class="kbd-label">for Yes</span>
+          <span class="kbd">N</span><span class="kbd-label">for No</span>
+        </div>
+      </div>
+    </div>
   </div>
 
   <!-- View: Recommended Eliminations -->
   <div id="view-eliminations" style="display:none">
-    <h2>Recommended Eliminations</h2>
-    <p id="elimination-context"></p>
-    <p id="elimination-count"></p>
-    <ul id="elimination-list"></ul>
-    <button id="btn-deselect-all">Deselect All Recommended</button>
-    <button id="btn-confirm-next">Next Question</button>
-    <button id="btn-exit-from-eliminations">Exit Quiz (return to main page)</button>
+    <div class="quiz-overlay">
+      <div class="elim-card">
+        <h2 class="elim-title">Recommended Eliminations</h2>
+        <p id="elimination-context" class="elim-context"></p>
+        <p id="elimination-count" class="elim-count"></p>
+        <div id="elimination-list"></div>
+        <div class="elim-actions">
+          <button id="btn-deselect-all" class="btn-danger">Deselect All</button>
+          <button id="btn-confirm-next" class="btn-keep">Keep All &amp; Continue</button>
+          <button id="btn-exit-from-eliminations" class="btn-exit-link">← Exit Quiz</button>
+        </div>
+      </div>
+    </div>
   </div>
 
   <!-- View: Quiz Done -->
   <div id="view-quiz-done" style="display:none">
-    <h2>Quiz Complete</h2>
-    <p>You have answered all 40 questions. Review your remaining majors on the main page.</p>
-    <button id="btn-done-return">Return to Majors List</button>
+    <div class="done-overlay">
+      <div class="done-content">
+        <div class="checkmark-circle">
+          <svg width="144" height="144" viewBox="0 0 144 144" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="72" cy="72" r="70" stroke="#CFB991" stroke-width="3"/>
+            <circle cx="72" cy="72" r="70" fill="#CFB991" fill-opacity="0.06"/>
+            <path d="M44 76 L64 96 L104 52" stroke="#CFB991" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+        <h2 class="done-title">Quiz Complete</h2>
+        <div class="done-underline"></div>
+        <p class="done-subtitle">You've answered all the questions.<br>Here are your remaining majors.</p>
+        <div id="done-count-badge" class="done-count-badge"></div>
+        <button id="btn-done-return" class="btn-done-cta">View My Majors →</button>
+        <p class="done-hint">You can always retake the quiz to refine your results</p>
+      </div>
+    </div>
   </div>
 
   <script src="data.js"></script>
