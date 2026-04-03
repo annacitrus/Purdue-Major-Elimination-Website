@@ -26,29 +26,54 @@ function renderMainPage() {
 
   MAJORS_DATA.forEach(collegeObj => {
     const activeMajorsInCollege = collegeObj.majors.filter(m => state.activeMajors.has(m.name));
-    if (activeMajorsInCollege.length === 0) return; // no header for colleges without majors left
+    if (activeMajorsInCollege.length === 0) return;
 
-    // creates section for each college with active majors
-    const section = document.createElement("section");
-    const heading = document.createElement("h2");
-    heading.textContent = collegeObj.college;
-    section.appendChild(heading);
+    const section = document.createElement("div");
+    section.className = "college-section";
 
-    // loops to create a card for each active major in the college
+    // College header
+    const header = document.createElement("div");
+    header.className = "college-header";
+
+    const bar = document.createElement("div");
+    bar.className = "gold-bar-short";
+
+    const label = document.createElement("span");
+    label.className = "college-label";
+    label.textContent = collegeObj.college.toUpperCase();
+
+    const count = document.createElement("span");
+    count.className = "college-count";
+    count.textContent = activeMajorsInCollege.length + " major" + (activeMajorsInCollege.length === 1 ? "" : "s");
+
+    header.appendChild(bar);
+    header.appendChild(label);
+    header.appendChild(count);
+    section.appendChild(header);
+
+    // Major cards
     activeMajorsInCollege.forEach(major => {
       const card = document.createElement("div");
-      const nameSpan = document.createElement("span");
-      nameSpan.textContent = major.name + " ";
+      card.className = "major-card";
+
+      const nameEl = document.createElement("span");
+      nameEl.className = "major-name";
+      nameEl.textContent = major.name;
+
       const link = document.createElement("a");
+      link.className = "major-link";
       link.href = major.url || "#";
-      link.textContent = "[Purdue Page]";
+      link.textContent = "Purdue Page ↗";
       link.target = "_blank";
+      if (!major.url) link.style.visibility = "hidden";
+
       const btn = document.createElement("button");
+      btn.className = "btn-deselect";
       btn.textContent = "Deselect";
       btn.onclick = () => deselect(major.name);
-      card.appendChild(nameSpan);
+
+      card.appendChild(nameEl);
       card.appendChild(link);
-      card.appendChild(document.createTextNode(" "));
       card.appendChild(btn);
       section.appendChild(card);
     });
@@ -56,28 +81,34 @@ function renderMainPage() {
     collegesContainer.appendChild(section);
   });
 
-// creates the deselected majors section
+  // Deselected section
   const deselectedSection = document.getElementById("deselected-section");
   const deselectedContainer = document.getElementById("deselected-container");
   deselectedContainer.innerHTML = "";
 
-  // hides the deselected majors section if there are no majors deselected
   if (state.deselectedMajors.size === 0) {
     deselectedSection.style.display = "none";
     return;
   }
 
-  // shows the deselected majors section
   deselectedSection.style.display = "block";
-  // creates a card for each deselected major
+  document.getElementById("deselected-count").textContent =
+    state.deselectedMajors.size + " hidden";
+
   state.deselectedMajors.forEach(name => {
     const card = document.createElement("div");
-    const nameSpan = document.createElement("span");
-    nameSpan.textContent = name + " ";
+    card.className = "deselected-card";
+
+    const nameEl = document.createElement("span");
+    nameEl.className = "deselected-name";
+    nameEl.textContent = name;
+
     const btn = document.createElement("button");
+    btn.className = "btn-reselect";
     btn.textContent = "Re-select";
     btn.onclick = () => reselect(name);
-    card.appendChild(nameSpan);
+
+    card.appendChild(nameEl);
     card.appendChild(btn);
     deselectedContainer.appendChild(card);
   });
@@ -97,7 +128,6 @@ function reselect(name) {
   renderMainPage();
 }
 
-
 function startQuiz() {
   if (state.activeMajors.size === 0) {
     alert("No majors are currently selected. Re-select some majors before starting the quiz.");
@@ -115,6 +145,9 @@ function startQuiz() {
 function renderQuestion() {
   // ends the quiz when there are no more questions to ask
   if (state.currentQuestionIndex >= QUESTIONS.length) {
+    const remaining = state.activeMajors.size;
+    document.getElementById("done-count-badge").textContent =
+      remaining + " major" + (remaining === 1 ? "" : "s") + " left";
     showView("view-quiz-done");
     return;
   }
@@ -122,9 +155,16 @@ function renderQuestion() {
   // renders the current question
   showView("view-question");
   const q = QUESTIONS[state.currentQuestionIndex];
+
   document.getElementById("active-count").textContent =
-    state.activeMajors.size + " major(s) remaining in your list";
+    state.activeMajors.size + " major" + (state.activeMajors.size === 1 ? "" : "s") + " remaining";
   document.getElementById("question-text").textContent = q.text;
+
+  // Progress bar
+  const pct = Math.round((state.currentQuestionIndex / QUESTIONS.length) * 100);
+  document.getElementById("progress-bar-fill").style.width = pct + "%";
+  document.getElementById("progress-label").textContent =
+    (state.currentQuestionIndex + 1) + " / " + QUESTIONS.length;
 }
 
 // updates pendingEliminations and shows elimination view
@@ -145,51 +185,83 @@ function handleAnswer(answer) {
   showView("view-eliminations");
 }
 
-// renders the elimintation view
+// returns the college name for a given major name
+function getCollegeName(majorName) {
+  for (const collegeObj of MAJORS_DATA) {
+    if (collegeObj.majors.some(m => m.name === majorName)) {
+      return collegeObj.college;
+    }
+  }
+  return "";
+}
+
+// renders the elimination view
 function renderEliminationsView(answer) {
   const q = QUESTIONS[state.currentQuestionIndex];
+  const answerLabel = answer === "yes" ? "Yes" : "No";
+
   document.getElementById("elimination-context").textContent =
-    'You answered "' + (answer || "Yes/No") + '" to: ' + q.text;
+    'Based on your answer: "' + answerLabel + '" to "' + q.text + '"';
+
+  const size = state.pendingEliminations.size;
   document.getElementById("elimination-count").textContent =
-    state.pendingEliminations.size + " major(s) recommended for elimination:";
+    size + " major" + (size === 1 ? "" : "s") + " recommended for elimination";
 
   const list = document.getElementById("elimination-list");
   list.innerHTML = "";
+
   state.pendingEliminations.forEach(name => {
-    const li = document.createElement("li");
-    li.textContent = name + " ";
+    const college = getCollegeName(name);
+
+    const item = document.createElement("div");
+    item.className = "elim-item";
+    item.dataset.major = name;
+
+    const nameEl = document.createElement("span");
+    nameEl.className = "elim-item-name";
+    nameEl.textContent = name;
+
+    const collegeEl = document.createElement("span");
+    collegeEl.className = "elim-item-college";
+    collegeEl.textContent = college;
+
     const btn = document.createElement("button");
+    btn.className = "btn-deselect-this";
     btn.textContent = "Deselect This";
     btn.onclick = () => deselectSingle(name);
-    li.appendChild(btn);
-    list.appendChild(li);
+
+    item.appendChild(nameEl);
+    item.appendChild(collegeEl);
+    item.appendChild(btn);
+    list.appendChild(item);
   });
 }
 
-// removes major from active majors and pending elimination to deselected majors
+// removes a single major with a fade animation, then advances if list is empty
 function deselectSingle(name) {
   state.activeMajors.delete(name);
   state.deselectedMajors.add(name);
   state.pendingEliminations.delete(name);
 
-  // Rebuild list in place
-  const list = document.getElementById("elimination-list");
-  list.innerHTML = "";
-  state.pendingEliminations.forEach(n => {
-    const li = document.createElement("li");
-    li.textContent = n + " ";
-    const btn = document.createElement("button");
-    btn.textContent = "Deselect This";
-    btn.onclick = () => deselectSingle(n);
-    li.appendChild(btn);
-    list.appendChild(li);
-  });
-  document.getElementById("elimination-count").textContent =
-    state.pendingEliminations.size + " major(s) recommended for elimination:";
-
-  if (state.pendingEliminations.size === 0) {
-    advanceQuestion();
+  // Fade out the item, then remove it
+  const item = document.querySelector('.elim-item[data-major="' + CSS.escape(name) + '"]');
+  if (item) {
+    item.classList.add("removing");
+    setTimeout(() => {
+      item.remove();
+      updateEliminationCount();
+      if (state.pendingEliminations.size === 0) advanceQuestion();
+    }, 300);
+  } else {
+    updateEliminationCount();
+    if (state.pendingEliminations.size === 0) advanceQuestion();
   }
+}
+
+function updateEliminationCount() {
+  const size = state.pendingEliminations.size;
+  document.getElementById("elimination-count").textContent =
+    size + " major" + (size === 1 ? "" : "s") + " recommended for elimination";
 }
 
 function deselectAllRecommended() {
@@ -260,6 +332,13 @@ function initApp() {
   document.getElementById("btn-done-return").addEventListener("click", () => {
     showView("view-main");
     renderMainPage();
+  });
+
+  // Keyboard shortcuts for quiz question view
+  document.addEventListener("keydown", (e) => {
+    if (state.currentView !== "view-question") return;
+    if (e.key === "y" || e.key === "Y") handleAnswer("yes");
+    if (e.key === "n" || e.key === "N") handleAnswer("no");
   });
 }
 
