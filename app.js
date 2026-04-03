@@ -163,8 +163,7 @@ function renderQuestion() {
   // Progress bar
   const pct = Math.round((state.currentQuestionIndex / QUESTIONS.length) * 100);
   document.getElementById("progress-bar-fill").style.width = pct + "%";
-  document.getElementById("progress-label").textContent =
-    (state.currentQuestionIndex + 1) + " / " + QUESTIONS.length;
+
 }
 
 // updates pendingEliminations and shows elimination view
