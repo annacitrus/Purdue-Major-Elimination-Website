@@ -105,6 +105,9 @@ function startQuiz() {
   }
   state.currentQuestionIndex = 0;
   state.pendingEliminations.clear();
+  while (state.currentQuestionIndex < QUESTIONS.length && shouldSkipQuestion()) {
+    state.currentQuestionIndex++;
+  }
   showView("view-question");
   renderQuestion();
 }
@@ -119,8 +122,6 @@ function renderQuestion() {
   // renders the current question
   showView("view-question");
   const q = QUESTIONS[state.currentQuestionIndex];
-  document.getElementById("quiz-progress").textContent =
-    "Question " + (state.currentQuestionIndex + 1) + " of " + QUESTIONS.length;
   document.getElementById("active-count").textContent =
     state.activeMajors.size + " major(s) remaining in your list";
   document.getElementById("question-text").textContent = q.text;
@@ -144,6 +145,7 @@ function handleAnswer(answer) {
   showView("view-eliminations");
 }
 
+// renders the elimintation view
 function renderEliminationsView(answer) {
   const q = QUESTIONS[state.currentQuestionIndex];
   document.getElementById("elimination-context").textContent =
@@ -164,6 +166,7 @@ function renderEliminationsView(answer) {
   });
 }
 
+// removes major from active majors and pending elimination to deselected majors
 function deselectSingle(name) {
   state.activeMajors.delete(name);
   state.deselectedMajors.add(name);
@@ -200,16 +203,16 @@ function deselectAllRecommended() {
 
 function confirmAndNext() {
   state.pendingEliminations.clear();
-  // Skip questions that can't eliminate any active major, using a loop instead of recursion
-  while (state.currentQuestionIndex < QUESTIONS.length && shouldSkipQuestion()) {
-    state.currentQuestionIndex++;
-  }
   advanceQuestion();
 }
 
 function advanceQuestion() {
   state.currentQuestionIndex++;
   state.pendingEliminations.clear();
+  // Skip questions that can't eliminate any active major
+  while (state.currentQuestionIndex < QUESTIONS.length && shouldSkipQuestion()) {
+    state.currentQuestionIndex++;
+  }
   renderQuestion();
 }
 
