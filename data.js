@@ -478,13 +478,13 @@ const QUESTIONS = [
     id: 10,
     text: "Are you primarily motivated by scientific research and advancing human knowledge, rather than applying that knowledge in a practical or commercial setting?",
     tag: "research",
-    eliminateIfNo: [
+    eliminateIfYes: [
       "Actuarial Science", "Mathematics", "Physics", "Astrophysics", "Planetary Sciences",
       "Statistics, Math Emphasis", "Comparative Literature", "Philosophy", "Classical Studies",
       "History of Science, Technology and Medicine", "Geology and Geophysics",
       "Ecology, Evolution and Environmental Sciences"
     ],
-    eliminateIfYes: [
+    eliminateIfNo: [
       "Agribusiness", "Agricultural Education", "Farm Management", "Turf Management and Science",
       "Sales and Marketing (Agriculture)", "Selling and Sales Management", "Retail Management",
       "Organizational Leadership", "Human Resource Development", "Themed Entertainment Design",
